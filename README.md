@@ -3,6 +3,10 @@ pandoc_reader
 
 A pandoc [markdown] reader plugin for [pelican]
 
+TODO
+------
+
+* Select CSL in a setting
 
 Requirements
 ------------
