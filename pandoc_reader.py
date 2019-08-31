@@ -65,9 +65,6 @@ class PandocReader(BaseReader):
         bib_header = self.settings.get('PANDOC_BIBHEADER', None)
 
         filters = self.settings.get('PANDOC_FILTERS', [])
-        extensions = self.settings.get('PANDOC_EXTENSIONS', '')
-        if isinstance(extensions, list):
-            extensions = ''.join(extensions)
 
         extra_args = self.settings.get('PANDOC_ARGS', [])
         extensions = self.settings.get('PANDOC_EXTENSIONS', '')
