@@ -38,9 +38,7 @@ class PandocReader(BaseReader):
             # Postprocess to make the data usable by Pelican.
             for k in parsed:
                 name, value = k.lower(), parsed[k]
-                # shouldn't need this for YAML
-                # metadata[name] = self.process_metadata(name, value)
-                metadata[name] = value
+                metadata[name] = self.process_metadata(name, value)
 
             # Return the text entirely.
             content = "\n".join(text[i:])
@@ -89,6 +87,7 @@ class PandocReader(BaseReader):
                         bib_header)]
 
         pandoc_cmd.extend(extra_args)
+        print(pandoc_cmd)
 
         proc = subprocess.Popen(
             pandoc_cmd,
