@@ -18,15 +18,16 @@ class PandocReader(BaseReader):
     file_extensions = ['md', 'markdown', 'mkd', 'mdown']
 
     def _get_meta_and_content(self, text):
+        lines = list(text.splitlines())
         metadata = {}
 
-        use_YAML = text[0] == '---' and yaml is not None
+        use_YAML = lines[0].strip() == '---' and yaml is not None
         if use_YAML:
             # Load the data we need to parse
             to_parse = []
-            for i, line in enumerate(text[1:]):
+            for i, line in enumerate(lines[1:]):
                 # When we find a terminator (`---` or `...`), stop.
-                if line in ('---', '...'):
+                if line.strip() in ('---', '...'):
                     # Do not include the terminator itself.
                     break
 
@@ -41,24 +42,26 @@ class PandocReader(BaseReader):
                 metadata[name] = self.process_metadata(name, value)
 
             # Return the text entirely.
-            content = "\n".join(text[i:])
+            content = "\n".join(lines[(i+2):])
 
         else:
-            for i, line in enumerate(text):
+            for i, line in enumerate( lines):
                 kv = line.split(':', 1)
                 if len(kv) == 2:
                     name, value = kv[0].lower(), kv[1].strip()
                     metadata[name] = self.process_metadata(name, value)
                 else:
-                    content = "\n".join(text[i:])
+                    content = "\n".join(lines[i:])
                     break
 
         return metadata, content
 
     def read(self, filename):
         with pelican_open(filename) as fp:
-            text = list(fp.splitlines())
+            text = fp
 
+        # Although we extract separate content here, in fact we don't use it
+        # pandoc is happy to have a metadata block.
         metadata, content = self._get_meta_and_content(text)
         bib_dir = self.settings.get('PANDOC_BIBDIR', '')
 
@@ -83,7 +86,7 @@ class PandocReader(BaseReader):
 
             if bib_header is not None:
                 extra_args = extra_args + [
-                    '--metadata=reference-section-title="{}"'.format(
+                    '--metadata=reference-section-title={}'.format(
                         bib_header)]
 
         pandoc_cmd.extend(extra_args)
@@ -94,7 +97,7 @@ class PandocReader(BaseReader):
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE)
 
-        output, err = proc.communicate(content.encode('utf-8'))
+        output, err = proc.communicate(text.encode('utf-8'))
         status = proc.wait()
         output, err = output.decode('utf-8'), err.decode('utf-8')
         if status > 0:
