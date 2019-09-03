@@ -87,7 +87,6 @@ class PandocReader(BaseReader):
                         bib_header)]
 
         pandoc_cmd.extend(extra_args)
-        print(pandoc_cmd)
 
         proc = subprocess.Popen(
             pandoc_cmd,
