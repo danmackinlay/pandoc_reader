@@ -5,11 +5,11 @@ from pelican import signals
 from pelican.readers import BaseReader
 from pelican.utils import pelican_open
 import os
-
+yaml = None
 try:
-    import yaml
+    from ruamel.yaml import YAML
+    yaml = YAML(typ='rt')
 except ImportError:
-    yaml = None
     logging.warning("YAML is not installed; the YAML reader will not work.")
 
 
