@@ -60,10 +60,25 @@ class PandocReader(BaseReader):
         with pelican_open(filename) as fp:
             text = fp
 
-        # Although we extract separate content here, in fact we don't use it
-        # pandoc is happy to have a metadata block.
+        # Although we extract and separate header and body here, we don't use it.
+        # pandoc is happy to process a metadata block for itself.
         metadata, content = self._get_meta_and_content(text)
-        bib_dir = self.settings.get('PANDOC_BIBDIR', '')
+
+        bib_dir = self.settings.get(
+            'PANDOC_BIBDIR',
+            os.path.dirname(filename))
+
+        bib_header = self.settings.get('PANDOC_BIBHEADER', None)
+
+        metadata = {}
+        for i, line in enumerate(text):
+            kv = line.split(':', 1)
+            if len(kv) == 2:
+                name, value = kv[0].lower(), kv[1].strip()
+                metadata[name] = self.process_metadata(name, value)
+            else:
+                content = "\n".join(text[i:])
+                break
 
         bib_header = self.settings.get('PANDOC_BIBHEADER', None)
 
