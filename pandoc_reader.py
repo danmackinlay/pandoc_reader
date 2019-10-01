@@ -3,13 +3,25 @@ from pelican import signals
 from pelican.readers import BaseReader
 from pelican.utils import pelican_open
 
+
 class PandocReader(BaseReader):
     enabled = True
     file_extensions = ['md', 'markdown', 'mkd', 'mdown']
 
     def read(self, filename):
         with pelican_open(filename) as fp:
-            text = list(fp.splitlines())
+            # text = list(fp.splitlines())
+            text = fp
+
+        # Although we extract and separate header and body here, we don't use it.
+        # pandoc is happy to process a metadata block for itself.
+        metadata, content = self._get_meta_and_content(text)
+
+        bib_dir = self.settings.get(
+            'PANDOC_BIBDIR',
+            os.path.dirname(filename))
+
+        bib_header = self.settings.get('PANDOC_BIBHEADER', None)
 
         metadata = {}
         for i, line in enumerate(text):
