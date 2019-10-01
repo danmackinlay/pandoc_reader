@@ -41,9 +41,10 @@ class PandocReader(BaseReader):
         pandoc_cmd = ["pandoc", "--from=markdown" + extensions, "--to=html5"]
         pandoc_cmd.extend(extra_args)
 
-        proc = subprocess.Popen(pandoc_cmd,
-                                stdin = subprocess.PIPE,
-                                stdout = subprocess.PIPE)
+        proc = subprocess.Popen(
+            pandoc_cmd,
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE)
 
         output = proc.communicate(content.encode('utf-8'))[0].decode('utf-8')
         status = proc.wait()
@@ -52,9 +53,11 @@ class PandocReader(BaseReader):
 
         return output, metadata
 
+
 def add_reader(readers):
     for ext in PandocReader.file_extensions:
         readers.reader_classes[ext] = PandocReader
+
 
 def register():
     signals.readers_init.connect(add_reader)
