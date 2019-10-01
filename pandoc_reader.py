@@ -45,14 +45,13 @@ class PandocReader(BaseReader):
             content = "\n".join(lines[(i+2):])
 
         else:
-            for i, line in enumerate( lines):
+            for i, line in enumerate(lines):
                 kv = line.split(':', 1)
                 if len(kv) == 2:
                     name, value = kv[0].lower(), kv[1].strip()
                     metadata[name] = self.process_metadata(name, value)
                 else:
                     content = "\n".join(lines[i:])
-                    break
 
         return metadata, content
 
@@ -69,21 +68,7 @@ class PandocReader(BaseReader):
             os.path.dirname(filename))
 
         bib_header = self.settings.get('PANDOC_BIBHEADER', None)
-
-        metadata = {}
-        for i, line in enumerate(text):
-            kv = line.split(':', 1)
-            if len(kv) == 2:
-                name, value = kv[0].lower(), kv[1].strip()
-                metadata[name] = self.process_metadata(name, value)
-            else:
-                content = "\n".join(text[i:])
-                break
-
-        bib_header = self.settings.get('PANDOC_BIBHEADER', None)
-
         filters = self.settings.get('PANDOC_FILTERS', [])
-
         extra_args = self.settings.get('PANDOC_ARGS', [])
         extensions = self.settings.get('PANDOC_EXTENSIONS', '')
         if isinstance(extensions, list):
