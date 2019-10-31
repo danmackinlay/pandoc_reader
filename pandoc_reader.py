@@ -85,9 +85,9 @@ class PandocReader(BaseReader):
                         bib_header)]
             pandoc_cmd.extend(bib_args)
 
-        if "toc" in metadata.keys():
-            if metadata['toc'] == True:
-                pandoc_cmd.extend(['--toc'])
+        if metadata.get('toc', False):
+            pandoc_cmd.extend(['--toc'])
+
         pandoc_cmd.extend(extra_args)
 
         proc = subprocess.Popen(
