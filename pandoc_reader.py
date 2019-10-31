@@ -63,21 +63,25 @@ class PandocReader(BaseReader):
         # pandoc is happy to process a metadata block for itself.
         metadata, content = self._get_meta_and_content(text)
 
-        bib_dir = self.settings.get(
-            'PANDOC_BIBDIR',
-            os.path.dirname(filename))
-
-        bib_header = self.settings.get('PANDOC_BIBHEADER', None)
-        filters = self.settings.get('PANDOC_FILTERS', [])
-        extra_args = self.settings.get('PANDOC_ARGS', [])
         extensions = self.settings.get('PANDOC_EXTENSIONS', '')
         if isinstance(extensions, list):
+            # Assume user supplied + and - delimeters
             extensions = ''.join(extensions)
 
         pandoc_cmd = ["pandoc", "--from=markdown" + extensions, "--to=html5"]
+
+        filters = self.settings.get('PANDOC_FILTERS', [])
         for filt in filters:
             pandoc_cmd.extend(["--filter={}".format( filt)])
 
+        bib_dir = self.settings.get(
+            'PANDOC_BIBDIR',
+            os.path.dirname(filename))
+        bib_header = self.settings.get(
+            'PANDOC_BIBHEADER',
+            None)
+
+        extra_args = self.settings.get('PANDOC_ARGS', [])
         if "bibliography" in metadata.keys():
             bib_file = os.path.join(bib_dir, metadata['bibliography'])
             if not os.path.exists(bib_file):
@@ -88,8 +92,11 @@ class PandocReader(BaseReader):
                 extra_args = extra_args + [
                     '--metadata=reference-section-title={}'.format(
                         bib_header)]
-
         pandoc_cmd.extend(extra_args)
+
+        if metadata.get('toc', False):
+            pandoc_cmd.extend(['--toc'])
+
 
         proc = subprocess.Popen(
             pandoc_cmd,
