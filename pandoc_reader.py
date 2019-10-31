@@ -60,9 +60,6 @@ class PandocReader(BaseReader):
             text = list(fp.splitlines())
 
         metadata, content = self._get_meta_and_content(text)
-        bib_dir = self.settings.get('PANDOC_BIBDIR', '')
-
-        bib_header = self.settings.get('PANDOC_BIBHEADER', None)
 
         filters = self.settings.get('PANDOC_FILTERS', [])
         extra_args = self.settings.get('PANDOC_ARGS', [])
@@ -74,16 +71,19 @@ class PandocReader(BaseReader):
         for filt in filters:
             pandoc_cmd.extend(["--filter", filt])
 
+        bib_dir = self.settings.get('PANDOC_BIBDIR', '')
+        bib_header = self.settings.get('PANDOC_BIBHEADER', None)
         if "bibliography" in metadata.keys():
             bib_file = os.path.join(bib_dir, metadata['bibliography'])
             if not os.path.exists(bib_file):
                 raise FileNotFoundError(bib_file)
-            extra_args = extra_args + ['--bibliography={}'.format(bib_file)]
+            bib_args = ['--bibliography={}'.format(bib_file)]
 
             if bib_header is not None:
-                extra_args = extra_args + [
+                bib_args = bib_args + [
                     '--metadata=reference-section-title="{}"'.format(
                         bib_header)]
+            pandoc_cmd.extend(bib_args)
 
         if "toc" in metadata.keys():
             if metadata['toc'] == True:
