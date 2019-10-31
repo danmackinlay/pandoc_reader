@@ -82,6 +82,7 @@ class PandocReader(BaseReader):
             None)
 
         extra_args = self.settings.get('PANDOC_ARGS', [])
+
         if "bibliography" in metadata.keys():
             bib_file = os.path.join(bib_dir, metadata['bibliography'])
             if not os.path.exists(bib_file):
@@ -93,7 +94,6 @@ class PandocReader(BaseReader):
                     '--metadata=reference-section-title={}'.format(
                         bib_header)]
         pandoc_cmd.extend(extra_args)
-
         proc = subprocess.Popen(
             pandoc_cmd,
             stdin=subprocess.PIPE,
