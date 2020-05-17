@@ -1,7 +1,8 @@
 pandoc_reader
 =============
 
-A pandoc [markdown] reader plugin for [pelican]
+A pandoc [markdown] reader plugin for [pelican].
+This enables you to use all the pandoc markdown, including (especially) `pandoc-citeproc` enabling an integrated citation workflow.
 
 TODO
 ------
